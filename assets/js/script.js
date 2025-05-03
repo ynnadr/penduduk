@@ -5,10 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingMessage = document.querySelector('.loading-message');
 
     const dataUrl = 'data/penduduk.json';
-    let allProvincesData = []; // Simpan data asli untuk filtering
+    let allProvincesData = []; // Simpan data provinsi yang sudah diproses untuk filtering
 
     // Fungsi untuk format angka Indonesia
     function formatNumber(num) {
+        // Handle null/undefined/non-numeric inputs gracefully
+        if (typeof num !== 'number' || isNaN(num)) {
+            return '0'; // Atau 'N/A', atau handle sesuai kebutuhan
+        }
         return num.toLocaleString('id-ID');
     }
 
@@ -21,19 +25,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const rawData = await response.json();
 
-            // Proses data: Grouping, Summing, Min/Max Year
-            const provinces = {};
-            let totalPopulation = 0;
+            // ---- Langkah 1: Filter untuk mendapatkan data terbaru per kabkot ----
+            const latestEntries = {}; // Objek untuk menyimpan data terbaru per kabkot
+            rawData.forEach(item => {
+                const kabkot = (item.kabkot || "Unknown").trim(); // Pastikan ada nama kabkot
+                const year = parseInt(item.tahun) || 0;
+
+                if (!latestEntries[kabkot] || year > latestEntries[kabkot].tahun) {
+                    // Jika kabkot belum ada, atau tahun item ini lebih baru, simpan/update
+                    latestEntries[kabkot] = { ...item, tahun: year }; // Simpan item lengkap, pastikan tahun adalah number
+                }
+            });
+            // latestData kini berisi array dari objek data terbaru per kabkot
+            const latestData = Object.values(latestEntries);
+
+            // ---- Langkah 2: Proses data terbaru (Grouping, Summing, Min/Max Year) ----
+            const provinces = {}; // Reset objek provinsi
+            let totalPopulation = 0; // Reset total populasi
             let minYear = Infinity;
             let maxYear = -Infinity;
 
-            rawData.forEach(item => {
-                // Pastikan data penduduk valid
+            latestData.forEach(item => {
+                // Gunakan data yang sudah difilter (latestData)
                 const population = parseInt(item.penduduk) || 0;
-                totalPopulation += population;
+                totalPopulation += population; // Hitung total dari data terbaru saja
 
-                const year = parseInt(item.tahun) || 0;
-                 if (year > 0) {
+                const year = item.tahun; // Ambil tahun yang sudah pasti terbaru
+                 if (year > 0) { // Cek lagi jika tahun valid
                     minYear = Math.min(minYear, year);
                     maxYear = Math.max(maxYear, year);
                  }
@@ -43,11 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!provinces[provinceName]) {
                     provinces[provinceName] = { totalPenduduk: 0, cities: [] };
                 }
+                // Akumulasi total provinsi dari data terbaru saja
                 provinces[provinceName].totalPenduduk += population;
+                // Tambahkan kota/kab (yang sudah pasti terbaru) ke daftar
                 provinces[provinceName].cities.push({
-                    name: item.kabkot || "Kab/Kota Tidak Diketahui",
+                    name: item.kabkot, // Nama sudah di-trim sebelumnya
                     population: population,
-                    year: year
+                    year: year // Tahun terbaru untuk kabkot ini
                 });
             });
 
@@ -55,20 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
              if (minYear === Infinity) minYear = "N/A";
              if (maxYear === -Infinity) maxYear = "N/A";
 
-            // Update Judul Halaman
-            titleElement.textContent = `Data Penduduk Indonesia (${minYear} - ${maxYear}) TOTAL ${formatNumber(totalPopulation)} orang`;
+            // ---- Langkah 3: Update Judul Halaman (gunakan total & tahun dari data terbaru) ----
+            titleElement.textContent = `Data Penduduk Indonesia Terbaru (${minYear} - ${maxYear}) TOTAL ${formatNumber(totalPopulation)} orang`;
 
-            // Sortir kota dalam provinsi & siapkan data provinsi untuk dirender
+            // ---- Langkah 4: Sortir dan Siapkan data untuk dirender (sama seperti sebelumnya) ----
             allProvincesData = Object.entries(provinces)
                 .map(([name, data]) => {
-                    // Sortir kota berdasarkan nama
                     data.cities.sort((a, b) => a.name.localeCompare(b.name));
                     return { name, ...data };
                 })
-                // Sortir provinsi berdasarkan nama
                 .sort((a, b) => a.name.localeCompare(b.name));
 
-            // Render daftar provinsi awal
+            // ---- Langkah 5: Render daftar provinsi awal ----
             renderProvinceList(allProvincesData);
 
         } catch (error) {
@@ -78,9 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fungsi untuk merender daftar provinsi ke HTML
+    // Fungsi untuk merender daftar provinsi ke HTML (TIDAK ADA PERUBAHAN DI FUNGSI INI)
     function renderProvinceList(provincesToRender) {
-        // Hapus pesan loading atau konten lama
         provinceListContainer.innerHTML = '';
 
         if (provincesToRender.length === 0) {
@@ -91,9 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
         provincesToRender.forEach(prov => {
             const provinceItem = document.createElement('div');
             provinceItem.classList.add('province-item');
-            provinceItem.dataset.provinceName = prov.name.toLowerCase(); // Untuk search
+            provinceItem.dataset.provinceName = prov.name.toLowerCase();
 
-            // Header Provinsi (Nama + Total Penduduk)
             const provinceHeader = document.createElement('div');
             provinceHeader.classList.add('province-header');
             provinceHeader.innerHTML = `
@@ -101,14 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="province-total">Total: ${formatNumber(prov.totalPenduduk)} jiwa</span>
             `;
 
-            // Daftar Kabupaten/Kota (Awalnya tersembunyi)
             const cityList = document.createElement('ul');
             cityList.classList.add('city-list');
 
             prov.cities.forEach(city => {
                 const cityItem = document.createElement('li');
                 cityItem.classList.add('city-item');
-                cityItem.dataset.cityName = city.name.toLowerCase(); // Untuk search
+                cityItem.dataset.cityName = city.name.toLowerCase();
                 cityItem.innerHTML = `
                     <span class="city-name">${city.name}</span>
                     <span class="city-population">${formatNumber(city.population)} <span class="city-year">(${city.year || 'N/A'})</span></span>
@@ -116,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 cityList.appendChild(cityItem);
             });
 
-            // Tambahkan event listener untuk toggle
             provinceHeader.addEventListener('click', () => {
                 provinceItem.classList.toggle('expanded');
             });
@@ -127,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fungsi untuk handle pencarian
+    // Fungsi untuk handle pencarian (TIDAK ADA PERUBAHAN DI FUNGSI INI)
     function handleSearch() {
         const searchTerm = searchInput.value.toLowerCase().trim();
         const allItems = provinceListContainer.querySelectorAll('.province-item');
@@ -138,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const cityNames = Array.from(item.querySelectorAll('.city-item'))
                                  .map(li => li.dataset.cityName);
 
-            // Cek kecocokan dengan nama provinsi ATAU salah satu nama kota/kab
             const isMatch = provinceName.includes(searchTerm) ||
                             cityNames.some(cityName => cityName.includes(searchTerm));
 
@@ -150,19 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Tampilkan pesan jika tidak ada hasil
          const noResultsMsg = provinceListContainer.querySelector('.no-results-message');
          if (visibleCount === 0 && searchTerm !== '') {
-             if (!noResultsMsg) { // Hanya tambahkan jika belum ada
+             if (!noResultsMsg) {
                  const msgElement = document.createElement('p');
                  msgElement.classList.add('no-results-message');
                  msgElement.textContent = 'Tidak ada provinsi atau kabupaten/kota yang cocok ditemukan.';
-                 // Sisipkan di awal agar terlihat jelas
                  provinceListContainer.insertBefore(msgElement, provinceListContainer.firstChild);
              }
          } else {
              if (noResultsMsg) {
-                 noResultsMsg.remove(); // Hapus pesan jika ada hasil atau input kosong
+                 noResultsMsg.remove();
              }
          }
     }
