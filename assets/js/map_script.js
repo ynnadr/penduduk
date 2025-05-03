@@ -1,19 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ... (Deklarasi variabel elemen HTML sama) ...
+    // Elemen Header
     const titleLine1Element = document.getElementById('main-title-line1');
     const titleLine2Element = document.getElementById('main-title-line2');
     const summaryCountElement = document.getElementById('summary-count');
     const loadingMessage = document.querySelector('#map-container .loading-message');
+
+    // Elemen Peta
     const mapContainer = document.getElementById('map-container');
     const mapElementId = 'map';
 
+    // URL Data (Hanya perlu data penduduk dan geojson provinsi)
     const populationDataUrl = 'data/penduduk.json';
     const provinceGeoJsonUrl = 'geojson/provinsi.geojson';
-    const kabkotGeoJsonUrl = 'geojson/kabupaten.geojson';
+    // const kabkotGeoJsonUrl = 'geojson/kabupaten.geojson'; // <-- Dihapus
 
+    // Variabel Global Peta
     let map;
-    let provinceGeojsonLayer;
-    let kabkotGeojsonLayer; // Kita tetap buat layernya
+    let provinceGeojsonLayer; // Hanya layer provinsi
+    // let kabkotGeojsonLayer;  // <-- Dihapus
     let infoBox;
     let legend;
     let provincePopulationData = {};
@@ -22,36 +26,34 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatNumber(num) { if (typeof num !== 'number' || isNaN(num)) { return '0'; } return num.toLocaleString('id-ID'); }
     function normalizeProvinceName(name) { if (!name) return "PROVINSI TIDAK DIKETAHUI"; let normalized = name.trim().toUpperCase(); if (normalized === 'P A P U A') { normalized = 'PAPUA'; } return normalized; }
 
-    // --- Fungsi Peta (Sama, kecuali bagian Kab/Kota) ---
+    // --- Fungsi Peta (Hanya untuk Provinsi) ---
     function getColor(population) { return population > 30000000 ? '#800026' : population > 15000000 ? '#BD0026' : population > 8000000  ? '#E31A1C' : population > 4000000  ? '#FC4E2A' : population > 2000000  ? '#FD8D3C' : population > 1000000  ? '#FEB24C' : population > 500000   ? '#FED976' : '#FFEDA0'; }
     function styleProvinceFeature(feature) { const provinceNameFromGeoJson = feature.properties.PROVINSI; const provinceNameNormalized = normalizeProvinceName(provinceNameFromGeoJson); const data = provincePopulationData[provinceNameNormalized]; const population = data ? data.totalPenduduk : 0; return { fillColor: getColor(population), weight: 1, opacity: 1, color: '#666', fillOpacity: 0.7 }; }
     function highlightProvinceFeature(e) { const layer = e.target; layer.setStyle({ weight: 3, color: '#333', fillOpacity: 0.85 }); if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) { layer.bringToFront(); } infoBox.update(layer.feature.properties); }
     function resetProvinceHighlight(e) { if (provinceGeojsonLayer) { provinceGeojsonLayer.resetStyle(e.target); } infoBox.update(); }
     function zoomToProvinceFeature(e) { map.fitBounds(e.target.getBounds()); }
-    // Listener Provinsi (onEachProvinceFeature) tetap menggunakan fungsi di atas
     function onEachProvinceFeature(feature, layer) { layer.on({ mouseover: highlightProvinceFeature, mouseout: resetProvinceHighlight, click: zoomToProvinceFeature }); }
-    // createInfoBox dan createLegend tetap sama
     function createInfoBox() { infoBox = L.control({ position: 'topright' }); infoBox.onAdd = function (map) { this._div = L.DomUtil.create('div', 'info-box'); this.update(); return this._div; }; infoBox.update = function (props) { const provinceNameFromGeoJson = props ? props.PROVINSI : null; const normalizedName = normalizeProvinceName(provinceNameFromGeoJson); const data = props && provincePopulationData[normalizedName] ? provincePopulationData[normalizedName] : null; const displayName = props ? provinceNameFromGeoJson : 'Arahkan kursor ke provinsi'; const populationText = data ? `${formatNumber(data.totalPenduduk)} jiwa` : 'Data penduduk tidak tersedia'; const kabkotText = data ? `${data.kabkotCount} Kab/Kota` : ''; this._div.innerHTML = `<h4>Informasi Provinsi</h4><b>${displayName}</b><br/>${data ? `${populationText}<br/>${kabkotText}` : populationText}`; }; infoBox.addTo(map); }
     function createLegend() { legend = L.control({position: 'bottomright'}); legend.onAdd = function (map) { const div = L.DomUtil.create('div', 'info-box legend'); const grades = [0, 500000, 1000000, 2000000, 4000000, 8000000, 15000000, 30000000]; const labels = []; let from, to; div.innerHTML += '<span class="legend-title">Penduduk (Jiwa)</span>'; for (let i = 0; i < grades.length; i++) { from = grades[i]; to = grades[i + 1]; labels.push('<span><i style="background:' + getColor(from + 1) + '"></i> ' + formatNumber(from) + (to ? '–' + formatNumber(to) : '+') + '</span>'); } div.innerHTML += labels.join(''); return div; }; legend.addTo(map); }
-
 
     // --- Fungsi Utama Inisialisasi Peta ---
     async function initializeMap() {
         if(loadingMessage) loadingMessage.textContent = "Mengambil data...";
         try {
-            // Ambil semua data
-            const [populationResponse, provinceGeoJsonResponse, kabkotGeoJsonResponse] = await Promise.all([
+            // Hanya fetch data penduduk dan geojson provinsi
+            const [populationResponse, provinceGeoJsonResponse] = await Promise.all([
                 fetch(populationDataUrl),
-                fetch(provinceGeoJsonUrl),
-                fetch(kabkotGeoJsonUrl)
+                fetch(provinceGeoJsonUrl)
+                // fetch(kabkotGeoJsonUrl) // <-- Dihapus
             ]);
+
             if (!populationResponse.ok) throw new Error(`Penduduk: ${populationResponse.status}`);
             if (!provinceGeoJsonResponse.ok) throw new Error(`GeoJSON Provinsi: ${provinceGeoJsonResponse.status}`);
-            if (!kabkotGeoJsonResponse.ok) throw new Error(`GeoJSON Kabupaten: ${kabkotGeoJsonResponse.status}`);
+            // Tidak perlu cek response kabkot lagi
 
             const rawData = await populationResponse.json();
             const provinceGeoJsonData = await provinceGeoJsonResponse.json();
-            const kabkotGeoJsonData = await kabkotGeoJsonResponse.json();
+            // const kabkotGeoJsonData = await kabkotGeoJsonResponse.json(); // <-- Dihapus
 
             // Proses data penduduk (sama seperti sebelumnya)
             console.log("Memproses data penduduk...");
@@ -70,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             provincePopulationData = {};
             let totalPopulation = 0;
             let minYear = Infinity; let maxYear = -Infinity;
-            const totalKabkot = latestData.length;
+            const totalKabkot = latestData.length; // Jumlah kabkot tetap dihitung dari data penduduk
             latestData.forEach(item => {
                 const population = parseInt(item.penduduk) || 0;
                 totalPopulation += population;
@@ -101,43 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
-            // --- REVISI Layer Kabupaten/Kota ---
-            console.log("Menambahkan layer GeoJSON Kabupaten/Kota (Hanya untuk Tooltip)...");
-            const kabkotStyle = {
-                weight: 0, // Tidak perlu garis batas jika hanya untuk hover
-                // color: 'transparent', // Atau buat transparan
-                fillOpacity: 0 // Tidak ada warna isian
-                // interactive: true // Defaultnya true, biarkan agar hover terdeteksi
-            };
-
-            kabkotGeojsonLayer = L.geoJson(kabkotGeoJsonData, {
-                style: kabkotStyle,
-                // --- BARU: Tambahkan className untuk styling CSS pointer-events ---
-                className: 'kabupaten-boundary-overlay', // Nama kelas CSS
-                onEachFeature: function (feature, layer) {
-                    const kabkotName = feature.properties.WADMKK || 'Nama Tidak Tersedia';
-                    layer.bindTooltip(kabkotName, {
-                        sticky: true,
-                        direction: 'auto',
-                        opacity: 0.8
-                    });
-                    // Tidak perlu event 'click' di sini
-                }
-            }).addTo(map); // Tambahkan layer kab/kota dulu agar di bawah provinsi
-            console.log("Layer Kabupaten/Kota ditambahkan.");
-            // --- AKHIR REVISI Layer Kab/Kota ---
-
-            // Tambahkan Layer GeoJSON Provinsi (Ditambahkan SETELAH Kab/Kota)
-            // Ini penting agar provinsi berada di atas untuk event klik
+            // Tambahkan Layer GeoJSON Provinsi (sama)
             console.log("Menambahkan layer GeoJSON Provinsi...");
             provinceGeojsonLayer = L.geoJson(provinceGeoJsonData, {
                 style: styleProvinceFeature,
-                onEachFeature: onEachProvinceFeature // Interaksi provinsi
-            }).addTo(map); // Tambahkan ke peta
+                onEachFeature: onEachProvinceFeature
+            }).addTo(map);
 
-             // Pindahkan layer provinsi ke paling depan jika perlu (opsional, tergantung Leaflet)
-             // provinceGeojsonLayer.bringToFront();
-
+            // --- Layer GeoJSON Kabupaten/Kota DIHAPUS ---
+            // console.log("Menambahkan layer GeoJSON Kabupaten/Kota...");
+            // ... (kode untuk kabkotGeojsonLayer dihapus) ...
+            // console.log("Layer Kabupaten/Kota ditambahkan.");
+            // --- AKHIR PENGHAPUSAN ---
 
             // Buat Info Box (untuk Provinsi) (sama)
             createInfoBox();
@@ -149,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Gagal menginisialisasi peta:", error);
-            // ... (Penanganan error sama) ...
              if(loadingMessage) { loadingMessage.textContent = `Gagal memuat peta: ${error.message}`; loadingMessage.style.color = '#d9534f'; } else if (mapContainer) { mapContainer.innerHTML = `<p class="error-message">Gagal memuat peta: ${error.message}</p>`; }
             titleLine1Element.textContent = "Gagal Memuat Peta"; titleLine2Element.textContent = ""; summaryCountElement.textContent = "Gagal memuat ringkasan";
         }
