@@ -334,3 +334,90 @@ footer a:hover {
 .hidden {
     display: none !important;
 }
+
+/* CSS Sebelumnya... (biarkan apa adanya) */
+
+/* =========================================
+   Peta Penduduk
+   ========================================= */
+#map {
+    height: 650px; /* Tinggi peta, sesuaikan sesuai kebutuhan */
+    width: 100%;
+    background-color: #eaf2f8; /* Warna latar belakang peta saat loading */
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px; /* Jarak ke elemen bawah */
+}
+
+/* Styling untuk kontrol Leaflet (Zoom, dll) */
+.leaflet-control-container .leaflet-control {
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    border-radius: 4px;
+}
+
+/* Styling untuk Info Box / Tooltip Kustom (Jika Digunakan) */
+.info-box {
+	padding: 6px 8px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.85);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+    border: 1px solid #ccc;
+}
+.info-box h4 {
+	margin: 0 0 5px;
+	color: #777;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+/* Styling untuk Legenda Peta */
+.legend {
+    line-height: 18px;
+    color: #555;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+     border: 1px solid #ccc;
+}
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.85;
+    border: 1px solid #999; /* Optional border for squares */
+}
+.legend span {
+    display: block;
+    margin-bottom: 3px; /* Jarak antar baris legenda */
+}
+.legend .legend-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+/* ... Sisa CSS ... */
+
+/* Penyesuaian Responsive untuk Peta */
+@media (max-width: 768px) {
+    #map {
+        height: 500px; /* Kurangi tinggi peta di layar kecil */
+    }
+}
+@media (max-width: 480px) {
+    #map {
+        height: 400px; /* Lebih kecil lagi di mobile */
+    }
+    .legend {
+        font-size: 0.8em;
+        padding: 8px 10px;
+    }
+    .legend i {
+        width: 14px;
+        height: 14px;
+    }
+}
