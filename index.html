@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Judul halaman daftar -->
     <title>Data Penduduk Indonesia per Provinsi</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <meta name="description" content="Visualisasi Data Penduduk Indonesia per Provinsi dan Kabupaten/Kota">
@@ -27,11 +26,13 @@
     </header>
 
     <main class="container">
-        <!-- === BARU: Link ke Halaman Grafik === -->
+        <!-- === MODIFIKASI: Tambahkan Link ke Peta === -->
         <div class="navigation-link-container">
             <a href="grafik_propinsi.html" class="view-chart-link">Lihat Grafik per Provinsi »</a>
+            <!-- Link Baru -->
+            <a href="peta_penduduk.html" class="view-chart-link">Lihat Peta Sebaran »</a>
         </div>
-        <!-- === AKHIR Link === -->
+        <!-- === AKHIR MODIFIKASI === -->
 
         <section id="province-list">
             <p class="loading-message">Memproses data provinsi...</p>
@@ -43,7 +44,6 @@
         <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
     </footer>
 
-    <!-- Script tetap script.js untuk halaman daftar ini -->
     <script src="assets/js/script.js"></script>
 </body>
 </html>
