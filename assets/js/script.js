@@ -24,20 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
             const rawData = await response.json();
 
-            // --- BARU: Pre-processing untuk menggabungkan provinsi ---
-            console.log("Preprocessing: Menggabungkan 'P A P U A' ke 'PAPUA'...");
-            rawData.forEach(item => {
-                // Trim nama provinsi untuk konsistensi
-                if (item.prov) {
-                    item.prov = item.prov.trim();
-                }
-                // Ganti nama provinsi jika cocok
-                if (item.prov === 'P A P U A') {
-                    item.prov = 'PAPUA'; // Ubah nama provinsi langsung di data mentah
-                }
-            });
-            console.log("Preprocessing selesai.");
-            // --- AKHIR Pre-processing ---
+            
 
             // Langkah 1: Filter data terbaru per kabkot (logika ini sekarang akan
             // secara otomatis memilih tahun terbaru jika ada kabkot yang sama
