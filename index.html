@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Penduduk Indonesia</title>
+    <!-- Judul halaman daftar -->
+    <title>Data Penduduk Indonesia per Provinsi</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <meta name="description" content="Visualisasi Data Penduduk Indonesia per Provinsi dan Kabupaten/Kota">
 </head>
 <body>
     <header class="container">
         <div class="title-block">
-            <!-- Hapus kata "Terbaru" -->
             <h1 id="main-title-line1">Memuat Data Penduduk Indonesia...</h1>
             <p id="main-title-line2">TOTAL ... orang</p>
-            <!-- Elemen baru untuk jumlah prov/kabkot -->
             <p id="summary-count">Memuat ringkasan...</p>
             <p class="data-source-info">
                 Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a>
@@ -28,8 +27,15 @@
     </header>
 
     <main class="container">
+        <!-- === BARU: Link ke Halaman Grafik === -->
+        <div class="navigation-link-container">
+            <a href="grafik_propinsi.html" class="view-chart-link">Lihat Grafik per Provinsi »</a>
+        </div>
+        <!-- === AKHIR Link === -->
+
         <section id="province-list">
             <p class="loading-message">Memproses data provinsi...</p>
+            <!-- Daftar provinsi akan dimasukkan di sini oleh JavaScript -->
         </section>
     </main>
 
@@ -37,6 +43,7 @@
         <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
     </footer>
 
+    <!-- Script tetap script.js untuk halaman daftar ini -->
     <script src="assets/js/script.js"></script>
 </body>
 </html>
