@@ -289,6 +289,44 @@ footer a:hover {
     }
 }
 
+
+/* =========================================
+   Link Navigasi (ke Grafik)
+   ========================================= */
+.navigation-link-container {
+    text-align: center; /* Pusatkan tombol/link */
+    margin-bottom: 25px; /* Jarak ke daftar provinsi di bawahnya */
+}
+
+.view-chart-link {
+    display: inline-block; /* Agar padding bisa diterapkan */
+    padding: 10px 20px;
+    background-color: #4a6fa5; /* Warna yang sama dengan header */
+    color: #fff;
+    text-decoration: none; /* Hapus garis bawah */
+    border-radius: 5px; /* Sudut membulat */
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transisi halus */
+}
+
+.view-chart-link:hover,
+.view-chart-link:focus { /* Efek saat hover atau fokus */
+    background-color: #3b598a; /* Warna sedikit lebih gelap */
+    transform: translateY(-1px); /* Efek sedikit terangkat */
+    text-decoration: none; /* Pastikan garis bawah tidak muncul */
+     color: #fff; /* Pastikan warna teks tetap putih */
+     outline: none; /* Hapus outline default saat fokus */
+}
+
+/* =========================================
+   Daftar Provinsi & Kabupaten/Kota (lanjutan...)
+   ========================================= */
+#province-list {
+    /* ... gaya #province-list tetap sama ... */
+}
+
+
+
 /* =========================================
    Utility Class
    ========================================= */
