@@ -3,33 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Judul Halaman Spesifik -->
     <title>Grafik Penduduk Indonesia per Provinsi</title>
-    <!-- Link ke CSS yang sama -->
     <link rel="stylesheet" href="assets/css/style.css">
     <meta name="description" content="Grafik Visualisasi Data Penduduk Indonesia per Provinsi">
-    <!-- Library Chart.js dari CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <!-- Sedikit style tambahan khusus untuk halaman ini jika diperlukan -->
     <style>
         .chart-container {
             position: relative;
-            margin: 30px auto; /* Beri jarak atas/bawah */
+            margin: 30px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            /* Atur tinggi maksimum atau aspek rasio jika diperlukan */
-            /* max-height: 600px; */
+             /* --- REVISI: Atur tinggi grafik utama --- */
+             height: 600px; /* Atau sesuaikan sesuai keinginan */
         }
-        /* Pastikan canvas mengisi kontainer */
         #provinceChartCanvas {
             max-width: 100%;
+        }
+
+        /* --- BARU: Style untuk kontainer grafik Kab/Kot --- */
+        #kabkotChartContainer {
+            display: none; /* Sembunyikan awalnya */
+            margin-top: 40px; /* Jarak dari grafik utama */
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            height: 500px; /* Sesuaikan tinggi grafik detail */
+        }
+         #kabkotChartCanvas {
+            max-width: 100%;
+        }
+         #kabkotChartTitle {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #166088;
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
-    <!-- Header (Struktur sama, tanpa search box) -->
     <header class="container">
         <div class="title-block">
             <h1 id="main-title-line1">Memuat Grafik Penduduk...</h1>
@@ -42,27 +57,30 @@
                 Didownload: April 2025
             </p>
         </div>
-        <!-- Search box dihapus dari halaman ini -->
     </header>
 
     <main class="container">
-        <!-- Kontainer untuk Grafik -->
+        <!-- Kontainer Grafik Provinsi -->
         <section class="chart-container">
             <p class="loading-message">Memproses data untuk grafik...</p>
             <canvas id="provinceChartCanvas"></canvas>
         </section>
-         <!-- Tombol kembali ke halaman utama -->
+
+        <!-- --- BARU: Kontainer untuk Grafik Kab/Kot (Awalnya Tersembunyi) --- -->
+        <section id="kabkotChartContainer">
+            <h2 id="kabkotChartTitle">Penduduk Kabupaten/Kota di [Nama Provinsi]</h2>
+            <canvas id="kabkotChartCanvas"></canvas>
+        </section>
+
          <div style="text-align: center; margin-top: 20px;">
             <a href="index.html" style="text-decoration: none; padding: 10px 20px; background-color: #4a6fa5; color: white; border-radius: 5px;">« Kembali ke Daftar Provinsi</a>
         </div>
     </main>
 
     <footer class="container">
-        <!-- Footer (sama seperti index.html) -->
         <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
     </footer>
 
-    <!-- Link ke Script JavaScript KHUSUS halaman ini -->
     <script src="assets/js/grafik_script.js"></script>
 </body>
 </html>
