@@ -32,18 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
             const rawData = await response.json();
 
-            // --- BARU: Pre-processing untuk menggabungkan provinsi ---
-            console.log("Preprocessing (Grafik): Menggabungkan 'P A P U A' ke 'PAPUA'...");
-            rawData.forEach(item => {
-                 if (item.prov) {
-                    item.prov = item.prov.trim();
-                }
-                if (item.prov === 'P A P U A') {
-                    item.prov = 'PAPUA';
-                }
-            });
-            console.log("Preprocessing (Grafik) selesai.");
-            // --- AKHIR Pre-processing ---
+           
 
 
             // Langkah 1: Filter data terbaru per kabkot (sama seperti di script.js)
