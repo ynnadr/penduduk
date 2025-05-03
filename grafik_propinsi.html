@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <meta name="description" content="Grafik Visualisasi Data Penduduk Indonesia per Provinsi">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> <!-- Opsional: Untuk label data -->
     <style>
         .chart-container {
             position: relative;
@@ -15,33 +16,37 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-             /* --- REVISI: Atur tinggi grafik utama --- */
-             height: 600px; /* Atau sesuaikan sesuai keinginan */
+            height: 600px; /* Tinggi grafik utama */
         }
         #provinceChartCanvas {
             max-width: 100%;
         }
-
-        /* --- BARU: Style untuk kontainer grafik Kab/Kot --- */
         #kabkotChartContainer {
-            display: none; /* Sembunyikan awalnya */
-            margin-top: 40px; /* Jarak dari grafik utama */
+            display: none;
+            margin-top: 40px;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            height: 500px; /* Sesuaikan tinggi grafik detail */
+            height: 500px;
         }
          #kabkotChartCanvas {
             max-width: 100%;
         }
-         #kabkotChartTitle {
+         #kabkotChartTitle { /* Judul utama grafik kab/kot */
             text-align: center;
             font-size: 1.2em;
             font-weight: 600;
             color: #166088;
-            margin-bottom: 15px;
+            margin-bottom: 5px; /* Kurangi margin bawah */
         }
+         /* --- BARU: Style untuk subjudul jumlah kab/kot --- */
+         #kabkotChartSubTitle {
+             text-align: center;
+             font-size: 0.9em;
+             color: #555;
+             margin-bottom: 15px;
+         }
     </style>
 </head>
 <body>
@@ -60,19 +65,20 @@
     </header>
 
     <main class="container">
-        <!-- Kontainer Grafik Provinsi -->
         <section class="chart-container">
             <p class="loading-message">Memproses data untuk grafik...</p>
             <canvas id="provinceChartCanvas"></canvas>
         </section>
 
-        <!-- --- BARU: Kontainer untuk Grafik Kab/Kot (Awalnya Tersembunyi) --- -->
         <section id="kabkotChartContainer">
+             <!-- Ubah judul menjadi dua bagian -->
             <h2 id="kabkotChartTitle">Penduduk Kabupaten/Kota di [Nama Provinsi]</h2>
+            <p id="kabkotChartSubTitle">([Jumlah] Kabupaten/Kota)</p>
             <canvas id="kabkotChartCanvas"></canvas>
         </section>
 
-         <div style="text-align: center; margin-top: 20px;">
+         <!-- --- REVISI: Tambah margin atas pada tombol kembali --- -->
+         <div style="text-align: center; margin-top: 50px;">
             <a href="index.html" style="text-decoration: none; padding: 10px 20px; background-color: #4a6fa5; color: white; border-radius: 5px;">« Kembali ke Daftar Provinsi</a>
         </div>
     </main>
