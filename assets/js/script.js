@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (maxYear === -Infinity) maxYear = "N/A";
 
             // --- PERUBAHAN: Update Judul Halaman (Split Lines) ---
-            titleLine1Element.textContent = `Data Penduduk Indonesia Terbaru (${minYear} - ${maxYear})`;
+            titleLine1Element.textContent = `Data Penduduk Indonesia (${minYear} - ${maxYear})`;
             titleLine2Element.textContent = `TOTAL ${formatNumber(totalPopulation)} orang`;
             // Info sumber dan tanggal download sudah ada di HTML statis
 
