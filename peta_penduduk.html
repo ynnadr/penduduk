@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Sebaran Penduduk Indonesia</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- CSS Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <!-- JavaScript Leaflet (WAJIB sebelum script peta Anda) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <meta name="description" content="Peta Sebaran Penduduk Indonesia per Provinsi">
+</head>
+<body>
+    <header class="container">
+        <!-- Header sama seperti halaman grafik, tanpa search -->
+        <div class="title-block">
+            <h1 id="main-title-line1">Memuat Peta Penduduk...</h1>
+            <p id="main-title-line2">TOTAL ... orang</p>
+            <p id="summary-count">Memuat ringkasan...</p>
+            <p class="data-source-info">
+                Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a>
+            </p>
+            <p class="data-source-info">
+                Didownload: April 2025
+            </p>
+        </div>
+    </header>
 
+    <main class="container">
+        <!-- Kontainer Peta -->
+        <section id="map-container">
+            <p class="loading-message">Memuat peta dan data...</p>
+            <div id="map"></div>
+        </section>
+
+        <!-- Tombol kembali -->
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="index.html" style="text-decoration: none; padding: 10px 20px; background-color: #4a6fa5; color: white; border-radius: 5px;">« Kembali ke Daftar Provinsi</a>
+        </div>
+    </main>
+
+    <footer class="container">
+        <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
+    </footer>
+
+    <!-- Script Peta -->
+    <script src="assets/js/map_script.js"></script>
+</body>
+</html>
