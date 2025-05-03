@@ -3,35 +3,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleLine1Element = document.getElementById('main-title-line1');
     const titleLine2Element = document.getElementById('main-title-line2');
     const summaryCountElement = document.getElementById('summary-count');
-    const chartCanvas = document.getElementById('provinceChartCanvas'); // Canvas Grafik Provinsi
+    const chartCanvas = document.getElementById('provinceChartCanvas');
     const loadingMessage = document.querySelector('.chart-container .loading-message');
 
     // Elemen untuk grafik kab/kota
     const kabkotChartContainer = document.getElementById('kabkotChartContainer');
-    const kabkotChartCanvas = document.getElementById('kabkotChartCanvas'); // Canvas Grafik Kab/Kota
+    const kabkotChartCanvas = document.getElementById('kabkotChartCanvas');
     const kabkotChartTitle = document.getElementById('kabkotChartTitle');
+    const kabkotChartSubTitle = document.getElementById('kabkotChartSubTitle'); // Elemen subjudul baru
 
     const dataUrl = 'data/penduduk.json';
 
-    // Variabel global untuk menyimpan data olahan dan instance chart
-    let processedProvinceData = []; // Menyimpan { name, totalPenduduk, cities: [...], kabkotCount }
-    let provinceLabels = []; // Menyimpan nama provinsi sesuai urutan grafik
-    let kabkotChartInstance = null; // Menyimpan instance chart kab/kota
+    // Variabel global
+    let processedProvinceData = [];
+    let provinceLabels = [];
+    let kabkotChartInstance = null;
+    const POPULATION_THRESHOLD = 200000; // Batas populasi untuk klik label vs bar
 
-    // Fungsi format angka (sama)
     function formatNumber(num) {
         if (typeof num !== 'number' || isNaN(num)) { return '0'; }
         return num.toLocaleString('id-ID');
     }
 
-    // Fungsi utama untuk ambil data dan buat grafik
     async function fetchDataAndCreateChart() {
         try {
             const response = await fetch(dataUrl);
             if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
             const rawData = await response.json();
 
-            // Langkah 1: Filter data terbaru per kabkot (sama)
+            // Langkah 1: Filter data terbaru (sama)
             const latestEntries = {};
             rawData.forEach(item => {
                 const kabkot = (item.kabkot || "Unknown").trim();
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const latestData = Object.values(latestEntries);
 
-            // Langkah 2: Proses data terbaru untuk grafik & ringkasan (sama)
+            // Langkah 2: Proses data terbaru (sama)
             const provincesTemp = {};
             let totalPopulation = 0;
             let minYear = Infinity;
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             titleLine2Element.textContent = `TOTAL ${formatNumber(totalPopulation)} orang`;
             summaryCountElement.textContent = `${totalProvinces} Provinsi - ${totalKabkot} Kabupaten/Kota`;
 
-            // Langkah 4: Siapkan data untuk Chart.js dan simpan secara global (sama)
+            // Langkah 4: Siapkan data untuk Chart.js dan simpan global (sama)
             const sortedProvinces = Object.entries(provincesTemp)
                                         .sort((a, b) => a[0].localeCompare(b[0]))
                                         .map(([name, data]) => {
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (loadingMessage) { loadingMessage.style.display = 'none'; }
 
-            // Langkah 5: Buat Grafik Provinsi dengan Skala Logaritmik
+            // Langkah 5: Buat Grafik Provinsi (kembali ke Skala Linear)
             createProvinceChart(chartCanvas, provinceLabels, populationData, kabkotCounts);
 
         } catch (error) {
@@ -106,10 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fungsi untuk membuat grafik batang PROVINSI (dengan Skala Logaritmik)
+    // Fungsi untuk membuat grafik batang PROVINSI (Skala Linear, onClick Hybrid)
     function createProvinceChart(canvasElement, labels, populationData, kabkotCounts) {
         if (!canvasElement) { console.error("Elemen Canvas Provinsi tidak ditemukan!"); return; }
         const ctx = canvasElement.getContext('2d');
+
+        // Hancurkan chart lama jika ada (misalnya jika data di-refresh)
+        const existingChart = Chart.getChart(ctx);
+        if (existingChart) {
+            existingChart.destroy();
+        }
 
         new Chart(ctx, {
             type: 'bar',
@@ -126,30 +132,21 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Penting agar tinggi CSS efektif
+                maintainAspectRatio: false,
                 scales: {
-                    // --- IMPLEMENTASI SKALA LOGARITMIK ---
+                    // --- Kembali ke Skala Linear ---
                     y: {
-                        type: 'logarithmic', // Tipe skala logaritmik
-                        min: 10000, // Nilai minimum sumbu Y (sesuaikan jika perlu)
+                        beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Jumlah Penduduk (Jiwa) - Skala Logaritmik' // Beri keterangan
-                        },
-                        ticks: {
-                            callback: function(value, index, ticks) {
-                                // Format label sumbu Y agar lebih mudah dibaca
-                                if (value === 10000 || value === 100000 || value === 1000000 || value === 10000000 || value === 100000000) {
-                                    return formatNumber(value);
-                                }
-                                return ''; // Sembunyikan label minor
-                            },
+                            text: 'Jumlah Penduduk (Jiwa)'
                         }
+                        // Tidak perlu ticks callback khusus lagi
                     },
-                    // --- AKHIR SKALA LOGARITMIK ---
+                    // --- AKHIR Skala Linear ---
                     x: {
                         title: { display: true, text: 'Provinsi' },
-                        ticks: { autoSkip: false, maxRotation: 90, minRotation: 60 } // Rotasi label X
+                        ticks: { autoSkip: false, maxRotation: 90, minRotation: 60 }
                     }
                 },
                 plugins: {
@@ -158,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         callbacks: {
                             label: function(context) {
                                 const labelIndex = context.dataIndex;
-                                const populationValue = context.raw; // Gunakan .raw untuk nilai asli pada skala log
+                                const populationValue = context.parsed.y; // Kembali pakai parsed.y untuk linear
                                 const kabkotCount = context.dataset.kabkotCounts[labelIndex];
                                 return [
                                     `Penduduk: ${formatNumber(populationValue)} jiwa`,
@@ -168,34 +165,78 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 },
-                // Event handler saat bar diklik (tetap sama)
-                onClick: (event, elements) => {
-                    if (elements.length > 0) {
-                        const clickedElementIndex = elements[0].index;
-                        const clickedProvinceName = provinceLabels[clickedElementIndex];
+                // --- REVISI LOGIKA onClick ---
+                onClick: (event, elements, chart) => {
+                    let clickedIndex = -1;
+                    let triggerDetail = false;
+
+                    if (elements.length > 0) { // Klik mengenai elemen (batang)
+                        const index = elements[0].index;
+                        const population = chart.data.datasets[0].data[index];
+                        if (population >= POPULATION_THRESHOLD) {
+                            clickedIndex = index;
+                            triggerDetail = true;
+                            console.log("Klik terdeteksi pada BAR > threshold:", provinceLabels[clickedIndex]);
+                        } else {
+                            console.log("Klik pada BAR < threshold, abaikan klik bar, target label.");
+                            // Jangan trigger dari klik bar kecil
+                        }
+                    } else { // Klik tidak mengenai elemen, cek posisi dekat label X
+                        const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                        const chartArea = chart.chartArea;
+                        // Cek apakah klik di dalam area chart horizontal, dan di area bawah (dekat label X)
+                        if (canvasPosition.x >= chartArea.left && canvasPosition.x <= chartArea.right &&
+                            canvasPosition.y >= chartArea.bottom - 30 && canvasPosition.y <= chart.height) { // Cek area bawah (30px dari bottom chart area)
+
+                            const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+                            if (dataX >= 0 && dataX < chart.data.labels.length) {
+                                const index = Math.round(dataX);
+                                const population = chart.data.datasets[0].data[index];
+                                if (population < POPULATION_THRESHOLD) {
+                                    clickedIndex = index;
+                                    triggerDetail = true;
+                                    console.log("Klik terdeteksi pada LABEL < threshold:", provinceLabels[clickedIndex]);
+                                } else {
+                                     console.log("Klik pada LABEL >= threshold, abaikan klik label.");
+                                }
+                            }
+                        } else {
+                            console.log("Klik di luar area chart atau jauh dari label X.");
+                        }
+                    }
+
+                    // Jika ada target klik yang valid
+                    if (triggerDetail && clickedIndex !== -1) {
+                        const clickedProvinceName = provinceLabels[clickedIndex];
                         const provinceDetail = processedProvinceData.find(p => p.name === clickedProvinceName);
+
                         if (provinceDetail && provinceDetail.cities) {
                             const kabkotLabels = provinceDetail.cities.map(c => c.name);
                             const kabkotPopulations = provinceDetail.cities.map(c => c.population);
-                            createOrUpdateKabkotChart(clickedProvinceName, kabkotLabels, kabkotPopulations);
+                            // --- Kirim kabkotCount ke fungsi detail ---
+                            createOrUpdateKabkotChart(clickedProvinceName, provinceDetail.kabkotCount, kabkotLabels, kabkotPopulations);
                         } else {
                             console.warn("Data detail untuk provinsi", clickedProvinceName, "tidak ditemukan.");
-                             if (kabkotChartInstance) kabkotChartInstance.destroy();
-                             kabkotChartInstance = null;
-                             kabkotChartContainer.style.display = 'none';
+                            if (kabkotChartInstance) kabkotChartInstance.destroy();
+                            kabkotChartInstance = null;
+                            kabkotChartContainer.style.display = 'none';
                         }
                     }
                 }
+                // --- Akhir revisi onClick ---
             }
         });
     }
 
-    // Fungsi untuk membuat atau memperbarui grafik KAB/KOTA (tetap sama)
-    function createOrUpdateKabkotChart(provinceName, labels, populationData) {
+    // --- REVISI: Fungsi untuk membuat atau memperbarui grafik KAB/KOTA (tambah kabkotCount) ---
+    function createOrUpdateKabkotChart(provinceName, kabkotCount, labels, populationData) {
         if (!kabkotChartCanvas) { console.error("Elemen Canvas Kab/Kota tidak ditemukan!"); return; }
         if (kabkotChartInstance) { kabkotChartInstance.destroy(); }
 
+        // Update judul dan subjudul
         kabkotChartTitle.textContent = `Penduduk Kabupaten/Kota di ${provinceName}`;
+        kabkotChartSubTitle.textContent = `(${kabkotCount} Kabupaten/Kota)`; // Tampilkan jumlah
+
         const ctx = kabkotChartCanvas.getContext('2d');
         kabkotChartInstance = new Chart(ctx, {
             type: 'bar',
@@ -204,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 datasets: [{
                     label: 'Jumlah Penduduk',
                     data: populationData,
-                    backgroundColor: 'rgba(22, 160, 133, 0.7)', // Warna hijau toska
+                    backgroundColor: 'rgba(22, 160, 133, 0.7)',
                     borderColor: 'rgba(22, 160, 133, 1)',
                     borderWidth: 1
                 }]
@@ -214,12 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 maintainAspectRatio: false,
                  scales: {
                     y: {
-                        beginAtZero: true, // Grafik kab/kota tetap linear
+                        beginAtZero: true,
                         title: { display: true, text: 'Jumlah Penduduk (Jiwa)' }
                     },
                      x: {
                         title: { display: true, text: 'Kabupaten/Kota' },
-                         ticks: { autoSkip: false, maxRotation: 90, minRotation: 60 } // Rotasi label X
+                         ticks: { autoSkip: false, maxRotation: 90, minRotation: 60 }
                      }
                  },
                  plugins: {
