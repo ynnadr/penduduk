@@ -26,9 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             
 
-            // Langkah 1: Filter data terbaru per kabkot (logika ini sekarang akan
-            // secara otomatis memilih tahun terbaru jika ada kabkot yang sama
-            // di 'PAPUA' dan bekas 'P A P U A' karena nama provinsinya sudah disamakan)
+            
             const latestEntries = {};
             rawData.forEach(item => {
                 const kabkot = (item.kabkot || "Unknown").trim();
