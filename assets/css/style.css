@@ -422,11 +422,3 @@ footer a:hover {
     }
 }
 
-
-/* =========================================
-   Layer Kabupaten/Kota Overlay
-   ========================================= */
-.kabupaten-boundary-overlay path { /* Target elemen path SVG/VML yang digambar Leaflet */
-    pointer-events: none; /* Biarkan klik tembus ke layer di bawahnya */
-    /* Gaya visual garis batas tetap bisa diatur di JS (weight, color, dashArray) */
-}
