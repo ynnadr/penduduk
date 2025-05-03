@@ -1,47 +1,89 @@
-/* Reset Dasar (sama seperti sebelumnya) */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background-color: #f4f7f6; color: #333; padding-bottom: 40px; }
-.container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+/* =========================================
+   Reset Dasar & Gaya Global
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* Header (sama) */
-header { background-color: #4a6fa5; color: #fff; padding: 20px 15px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7f6; /* Latar belakang lembut */
+    color: #333; /* Warna teks default */
+    padding-bottom: 60px; /* Ruang ekstra untuk footer */
+}
 
-/* --- BARU: Penataan Judul dan Info Sumber --- */
+/* =========================================
+   Layout Kontainer
+   ========================================= */
+.container {
+    max-width: 900px; /* Lebar maksimum konten */
+    margin: 20px auto; /* Tengah secara horizontal, margin atas/bawah */
+    padding: 0 15px; /* Padding kiri/kanan */
+}
+
+/* =========================================
+   Header & Judul
+   ========================================= */
+header {
+    background-color: #4a6fa5; /* Biru modern */
+    color: #fff; /* Teks putih */
+    padding: 25px 20px; /* Padding lebih besar */
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Shadow sedikit lebih jelas */
+}
+
 .title-block {
     text-align: center;
-    margin-bottom: 20px; /* Jarak antara judul dan search box */
+    margin-bottom: 25px; /* Jarak ke search box */
 }
 
 #main-title-line1 {
-    font-size: 1.8em;
-    margin-bottom: 5px; /* Jarak ke baris total */
+    font-size: 2em; /* Sedikit lebih besar */
+    margin-bottom: 8px;
     font-weight: 600;
+    letter-spacing: -0.5px; /* Rapatkan sedikit */
 }
 
 #main-title-line2 {
-    font-size: 1.2em; /* Sedikit lebih kecil */
-    margin-bottom: 15px; /* Jarak ke info sumber */
+    font-size: 1.3em;
+    margin-bottom: 10px;
     font-weight: 500;
+    opacity: 0.9; /* Sedikit transparan */
+}
+
+#summary-count {
+    font-size: 0.95em;
+    color: #e0e0e0; /* Warna terang */
+    margin-top: -8px; /* Tarik sedikit ke atas */
+    margin-bottom: 18px; /* Jarak ke info sumber */
+    font-weight: 400;
 }
 
 .data-source-info {
     font-size: 0.8em;
-    color: #e0e0e0; /* Warna lebih redup */
-    line-height: 1.3; /* Rapatkan sedikit */
-    margin-bottom: 2px;
+    color: #cdd6e0; /* Warna abu-abu terang */
+    line-height: 1.4;
+    margin-bottom: 3px;
 }
 .data-source-info a {
-    color: #cceeff; /* Warna link lebih terang */
+    color: #d4eaff; /* Warna link lebih terang */
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 .data-source-info a:hover {
+    color: #ffffff;
     text-decoration: underline;
 }
-/* --- Akhir Penataan Judul --- */
 
-
+/* =========================================
+   Input Pencarian
+   ========================================= */
 .search-container {
-    margin-top: 0; /* Hapus margin atas karena sudah diatur .title-block */
+    margin-top: 0;
 }
 
 #search-input {
@@ -50,47 +92,146 @@ header { background-color: #4a6fa5; color: #fff; padding: 20px 15px; margin-bott
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
-    transition: border-color 0.3s ease;
-    color: #333; /* --- PERBAIKAN: Warna teks input agar terlihat --- */
-    background-color: #fff; /* Pastikan background putih */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    color: #333; /* Warna teks input yang terlihat */
+    background-color: #fff;
 }
-#search-input::placeholder { /* Gaya untuk placeholder */
+
+#search-input::placeholder {
+    color: #888; /* Warna placeholder */
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: #166088; /* Biru lebih gelap saat fokus */
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2); /* Efek glow saat fokus */
+}
+
+/* =========================================
+   Daftar Provinsi & Kabupaten/Kota
+   ========================================= */
+#province-list {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* Pastikan border-radius bekerja */
+}
+
+.loading-message,
+.error-message, /* Gaya untuk pesan error */
+.no-results-message {
+    padding: 25px 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+.error-message {
+    color: #d9534f; /* Warna merah untuk error */
+    font-weight: bold;
+    font-style: normal;
+}
+
+.province-item {
+    border-bottom: 1px solid #eee;
+}
+.province-item:last-child {
+    border-bottom: none;
+}
+
+.province-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-left: 5px solid transparent; /* Indikator tersembunyi */
+}
+
+.province-header:hover {
+    background-color: #e9ecef; /* Warna hover */
+}
+
+/* Gaya saat provinsi dibuka (expanded) */
+.province-item.expanded .province-header {
+     background-color: #e2e8f0; /* Sedikit lebih gelap saat terbuka */
+     border-left-color: #4a6fa5; /* Tampilkan warna indikator */
+}
+
+.province-name {
+    font-weight: 600;
+    color: #166088; /* Biru lebih gelap */
+    flex-grow: 1; /* Biarkan nama provinsi mengambil ruang */
+    margin-right: 10px; /* Jarak dari total */
+}
+
+.province-total {
+    font-size: 0.95em;
+    color: #555;
+    font-weight: 500;
+    white-space: nowrap; /* Hindari total pindah baris */
+}
+
+/* Daftar Kota/Kabupaten */
+.city-list {
+    list-style: none;
+    padding: 10px 20px 15px 45px; /* Indentasi kiri */
+    background-color: #f8f9fa; /* Latar belakang sedikit berbeda */
+    display: none; /* Sembunyikan secara default */
+    border-top: 1px dashed #ddd; /* Garis pemisah halus */
+}
+
+/* Tampilkan daftar kota saat provinsi dibuka */
+.province-item.expanded .city-list {
+    display: block;
+}
+
+.city-item {
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.9em;
+    border-bottom: 1px dotted #eee;
+    transition: background-color 0.2s ease; /* Transisi untuk highlight */
+}
+.city-item:last-child {
+    border-bottom: none;
+}
+
+.city-name {
+    color: #333;
+    flex-grow: 1; /* Biarkan nama kota mengambil ruang */
+    margin-right: 10px; /* Jarak dari populasi */
+}
+
+.city-population {
+    color: #666;
+    font-size: 0.9em;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.city-year {
+    font-style: italic;
     color: #888;
+    margin-left: 3px; /* Sedikit jarak dari angka */
 }
-#search-input:focus { outline: none; border-color: #166088; }
 
-/* Daftar Provinsi (sama) */
-#province-list { background-color: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
-.loading-message, .no-results-message { padding: 20px; text-align: center; color: #666; font-style: italic; }
-.province-item { border-bottom: 1px solid #eee; }
-.province-item:last-child { border-bottom: none; }
-.province-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #ffffff; cursor: pointer; transition: background-color 0.2s ease; border-left: 5px solid transparent; }
-.province-header:hover { background-color: #e9ecef; }
-.province-item.expanded .province-header { background-color: #e2e8f0; border-left-color: #4a6fa5; }
-.province-name { font-weight: 600; color: #166088; }
-.province-total { font-size: 0.95em; color: #555; font-weight: 500; }
-
-/* Daftar Kabupaten/Kota (sama) */
-.city-list { list-style: none; padding: 10px 20px 15px 45px; background-color: #f8f9fa; display: none; border-top: 1px dashed #ddd; }
-.province-item.expanded .city-list { display: block; }
-.city-item { padding: 8px 0; display: flex; justify-content: space-between; align-items: baseline; font-size: 0.9em; border-bottom: 1px dotted #eee; transition: background-color 0.2s ease; } /* Tambah transisi */
-.city-item:last-child { border-bottom: none; }
-.city-name { color: #333; }
-.city-population { color: #666; font-size: 0.9em; white-space: nowrap; margin-left: 10px; }
-.city-year { font-style: italic; color: #888; }
-
-/* --- BARU: Gaya untuk Highlight --- */
+/* Gaya Highlight untuk hasil pencarian kota */
 .city-item.highlighted {
     background-color: #fff3cd; /* Kuning lembut */
-    font-weight: bold;
+    font-weight: 500; /* Sedikit bold */
     /* Tambahkan sedikit padding untuk visual */
     padding-left: 5px;
     margin-left: -5px;
     border-radius: 3px;
 }
-/* --- Akhir Gaya Highlight --- */
 
-/* Footer (sedikit penyesuaian) */
+/* =========================================
+   Footer
+   ========================================= */
 footer {
     text-align: center;
     margin-top: 40px;
@@ -99,32 +240,59 @@ footer {
     font-size: 0.9em;
     color: #777;
 }
-footer a { /* Samakan gaya link footer */
-    color: #4a6fa5;
+footer a {
+    color: #4a6fa5; /* Samakan warna link dengan header */
     text-decoration: none;
 }
 footer a:hover {
     text-decoration: underline;
 }
 
-/* Responsive Design (sedikit penyesuaian untuk title baru) */
+/* =========================================
+   Responsive Design
+   ========================================= */
 @media (max-width: 768px) {
-    .container { margin: 15px auto; }
-    #main-title-line1 { font-size: 1.5em; }
+    .container {
+        margin: 15px auto;
+    }
+    #main-title-line1 { font-size: 1.7em; }
     #main-title-line2 { font-size: 1.1em; }
+    #summary-count { font-size: 0.9em; }
     .data-source-info { font-size: 0.75em; }
     .province-header { padding: 12px 15px; }
     .city-list { padding: 10px 15px 10px 35px; }
 }
+
 @media (max-width: 480px) {
-    #main-title-line1 { font-size: 1.3em; }
-     #main-title-line2 { font-size: 1em; }
+    #main-title-line1 { font-size: 1.4em; }
+    #main-title-line2 { font-size: 1em; }
+    #summary-count { font-size: 0.85em; }
     .data-source-info { font-size: 0.7em; }
-    .province-header { flex-direction: column; align-items: flex-start; padding: 10px 15px; }
-    .province-total { margin-top: 5px; font-size: 0.9em; }
-     .city-item { flex-direction: column; align-items: flex-start; padding: 10px 0; }
-    .city-population { margin-left: 0; margin-top: 3px; }
+
+    .province-header {
+       flex-direction: column; /* Tumpuk nama dan total */
+       align-items: flex-start; /* Rata kiri */
+       padding: 10px 15px;
+    }
+    .province-total {
+        margin-top: 5px;
+        font-size: 0.9em;
+    }
+     .city-item {
+       flex-direction: column; /* Tumpuk nama dan populasi */
+       align-items: flex-start;
+       padding: 10px 0;
+    }
+    .city-population {
+        margin-left: 0; /* Hapus margin kiri */
+        margin-top: 3px;
+    }
 }
 
-/* Helper class (sama) */
-.hidden { display: none !important; }
+/* =========================================
+   Utility Class
+   ========================================= */
+/* Untuk menyembunyikan elemen saat search atau kondisi lain */
+.hidden {
+    display: none !important;
+}
