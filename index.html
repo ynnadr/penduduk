@@ -9,7 +9,17 @@
 </head>
 <body>
     <header class="container">
-        <h1 id="main-title">Memuat Data Penduduk Indonesia...</h1>
+        <!-- Wadah baru untuk judul dan info sumber -->
+        <div class="title-block">
+            <h1 id="main-title-line1">Memuat Data Penduduk Indonesia...</h1>
+            <p id="main-title-line2">TOTAL ... orang</p>
+            <p class="data-source-info">
+                Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a>
+            </p>
+            <p class="data-source-info">
+                Didownload: April 2025 <!-- Sesuai permintaan, meskipun tahunnya mungkin perlu disesuaikan -->
+            </p>
+        </div>
         <div class="search-container">
             <input type="search" id="search-input" placeholder="Cari Provinsi atau Kabupaten/Kota...">
         </div>
@@ -23,7 +33,8 @@
     </main>
 
     <footer class="container">
-        <p>Sumber Data: Diolah dari data publik.</p>
+        <!-- Sesuaikan teks footer -->
+        <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
     </footer>
 
     <script src="assets/js/script.js"></script>
