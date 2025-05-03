@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Judul Halaman Spesifik -->
+    <title>Grafik Penduduk Indonesia per Provinsi</title>
+    <!-- Link ke CSS yang sama -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="description" content="Grafik Visualisasi Data Penduduk Indonesia per Provinsi">
+    <!-- Library Chart.js dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Sedikit style tambahan khusus untuk halaman ini jika diperlukan -->
+    <style>
+        .chart-container {
+            position: relative;
+            margin: 30px auto; /* Beri jarak atas/bawah */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            /* Atur tinggi maksimum atau aspek rasio jika diperlukan */
+            /* max-height: 600px; */
+        }
+        /* Pastikan canvas mengisi kontainer */
+        #provinceChartCanvas {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header (Struktur sama, tanpa search box) -->
+    <header class="container">
+        <div class="title-block">
+            <h1 id="main-title-line1">Memuat Grafik Penduduk...</h1>
+            <p id="main-title-line2">TOTAL ... orang</p>
+            <p id="summary-count">Memuat ringkasan...</p>
+            <p class="data-source-info">
+                Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a>
+            </p>
+            <p class="data-source-info">
+                Didownload: April 2025
+            </p>
+        </div>
+        <!-- Search box dihapus dari halaman ini -->
+    </header>
 
+    <main class="container">
+        <!-- Kontainer untuk Grafik -->
+        <section class="chart-container">
+            <p class="loading-message">Memproses data untuk grafik...</p>
+            <canvas id="provinceChartCanvas"></canvas>
+        </section>
+         <!-- Tombol kembali ke halaman utama -->
+         <div style="text-align: center; margin-top: 20px;">
+            <a href="index.html" style="text-decoration: none; padding: 10px 20px; background-color: #4a6fa5; color: white; border-radius: 5px;">« Kembali ke Daftar Provinsi</a>
+        </div>
+    </main>
+
+    <footer class="container">
+        <!-- Footer (sama seperti index.html) -->
+        <p>Sumber data: <a href="https://e-database.kemendagri.go.id/kemendagri/dataset/257/tabel-data" target="_blank" rel="noopener noreferrer">E-Database Kemendagri</a> (Didownload: April 2025).</p>
+    </footer>
+
+    <!-- Link ke Script JavaScript KHUSUS halaman ini -->
+    <script src="assets/js/grafik_script.js"></script>
+</body>
+</html>
