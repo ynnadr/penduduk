@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Ambil elemen judul dan ringkasan baru
+    // ... (deklarasi variabel elemen HTML sama seperti sebelumnya) ...
     const titleLine1Element = document.getElementById('main-title-line1');
     const titleLine2Element = document.getElementById('main-title-line2');
-    const summaryCountElement = document.getElementById('summary-count'); // Elemen baru
+    const summaryCountElement = document.getElementById('summary-count');
     const provinceListContainer = document.getElementById('province-list');
     const searchInput = document.getElementById('search-input');
-    const loadingMessage = document.querySelector('.loading-message');
+    const loadingMessage = document.querySelector('.loading-message'); // Ambil loading msg dari sini
 
     const dataUrl = 'data/penduduk.json';
     let allProvincesData = [];
@@ -16,28 +16,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchDataAndRender() {
+        // Hapus pesan loading lama jika ada
+        if(loadingMessage) loadingMessage.textContent = "Memproses data provinsi...";
+
         try {
             const response = await fetch(dataUrl);
             if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
             const rawData = await response.json();
 
-            // Langkah 1: Filter data terbaru (sama)
+            // --- BARU: Pre-processing untuk menggabungkan provinsi ---
+            console.log("Preprocessing: Menggabungkan 'P A P U A' ke 'PAPUA'...");
+            rawData.forEach(item => {
+                // Trim nama provinsi untuk konsistensi
+                if (item.prov) {
+                    item.prov = item.prov.trim();
+                }
+                // Ganti nama provinsi jika cocok
+                if (item.prov === 'P A P U A') {
+                    item.prov = 'PAPUA'; // Ubah nama provinsi langsung di data mentah
+                }
+            });
+            console.log("Preprocessing selesai.");
+            // --- AKHIR Pre-processing ---
+
+            // Langkah 1: Filter data terbaru per kabkot (logika ini sekarang akan
+            // secara otomatis memilih tahun terbaru jika ada kabkot yang sama
+            // di 'PAPUA' dan bekas 'P A P U A' karena nama provinsinya sudah disamakan)
             const latestEntries = {};
             rawData.forEach(item => {
                 const kabkot = (item.kabkot || "Unknown").trim();
                 const year = parseInt(item.tahun) || 0;
-                if (!latestEntries[kabkot] || year > latestEntries[kabkot].tahun) {
-                    latestEntries[kabkot] = { ...item, tahun: year };
+                // Pastikan item.prov ada sebelum mengaksesnya
+                const provinceKey = item.prov || "Unknown";
+                // Gunakan kombinasi kabkot dan prov sebagai kunci unik sementara
+                // untuk memastikan kita tidak salah menggabungkan kabkot dengan nama sama di provinsi berbeda
+                const uniqueKey = `${provinceKey}_${kabkot}`;
+
+                if (!latestEntries[uniqueKey] || year > latestEntries[uniqueKey].tahun) {
+                    latestEntries[uniqueKey] = { ...item, tahun: year };
                 }
             });
-            const latestData = Object.values(latestEntries); // latestData berisi data unik & terbaru per kabkot
+            const latestData = Object.values(latestEntries);
 
-            // Langkah 2: Proses data terbaru (sama)
+            // Langkah 2: Proses data terbaru (sama seperti sebelumnya)
             const provinces = {};
             let totalPopulation = 0;
             let minYear = Infinity;
             let maxYear = -Infinity;
-            // --- BARU: Hitung jumlah kabkot unik dari data terbaru ---
             const totalKabkot = latestData.length;
 
             latestData.forEach(item => {
@@ -48,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     minYear = Math.min(minYear, year);
                     maxYear = Math.max(maxYear, year);
                  }
-                const provinceName = item.prov || "Provinsi Tidak Diketahui";
+                const provinceName = item.prov; // Nama provinsi sudah dibersihkan
                 if (!provinces[provinceName]) {
                     provinces[provinceName] = { totalPenduduk: 0, cities: [] };
                 }
@@ -59,20 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     year: year
                 });
             });
+
              if (minYear === Infinity) minYear = "N/A";
              if (maxYear === -Infinity) maxYear = "N/A";
-
-             // --- BARU: Hitung jumlah provinsi unik ---
              const totalProvinces = Object.keys(provinces).length;
 
-
-            // Langkah 3: Update Judul Halaman
-            // Hapus kata "Terbaru"
+            // Langkah 3: Update Judul Halaman (sama)
             titleLine1Element.textContent = `Data Penduduk Indonesia (${minYear} - ${maxYear})`;
             titleLine2Element.textContent = `TOTAL ${formatNumber(totalPopulation)} orang`;
-            // --- BARU: Update Ringkasan Jumlah ---
             summaryCountElement.textContent = `${totalProvinces} Provinsi - ${totalKabkot} Kabupaten/Kota`;
-
 
             // Langkah 4: Sortir dan Siapkan data (sama)
             allProvincesData = Object.entries(provinces)
@@ -85,17 +105,29 @@ document.addEventListener('DOMContentLoaded', () => {
             // Langkah 5: Render daftar provinsi awal (sama)
             renderProvinceList(allProvincesData);
 
+             // Hapus pesan loading setelah selesai render
+             if(loadingMessage) loadingMessage.remove();
+
+
         } catch (error) {
             console.error("Gagal memuat atau memproses data:", error);
-            provinceListContainer.innerHTML = '<p class="error-message">Gagal memuat data penduduk. Silakan coba lagi nanti.</p>';
+            // Tampilkan pesan error di tempat loading message
+             if(loadingMessage) {
+                 loadingMessage.textContent = 'Gagal memuat data penduduk. Silakan coba lagi nanti.';
+                 loadingMessage.classList.add('error-message'); // Tambah class error jika ada
+                 loadingMessage.classList.remove('loading-message');
+             } else { // Jika loading message tidak ada, tambahkan pesan error ke container
+                 provinceListContainer.innerHTML = '<p class="error-message">Gagal memuat data penduduk. Silakan coba lagi nanti.</p>';
+             }
             titleLine1Element.textContent = "Gagal Memuat Data";
             titleLine2Element.textContent = "";
-            summaryCountElement.textContent = "Gagal memuat ringkasan"; // Update ringkasan jika error
+            summaryCountElement.textContent = "Gagal memuat ringkasan";
         }
     }
 
-    // Fungsi renderProvinceList (TIDAK BERUBAH)
+    // --- Fungsi renderProvinceList TIDAK BERUBAH ---
     function renderProvinceList(provincesToRender) {
+        // Pastikan container bersih sebelum render
         provinceListContainer.innerHTML = '';
         if (provincesToRender.length === 0) {
              provinceListContainer.innerHTML = '<p class="no-results-message">Tidak ada data provinsi yang cocok ditemukan.</p>';
@@ -124,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fungsi handleSearch (TIDAK BERUBAH)
+
+    // --- Fungsi handleSearch TIDAK BERUBAH ---
     function handleSearch() {
         const searchTerm = searchInput.value.toLowerCase().trim();
         const allProvinceItems = provinceListContainer.querySelectorAll('.province-item');
@@ -175,7 +208,13 @@ document.addEventListener('DOMContentLoaded', () => {
            const msgElement = document.createElement('p');
            msgElement.classList.add('no-results-message');
            msgElement.textContent = 'Tidak ada provinsi atau kabupaten/kota yang cocok ditemukan.';
-           provinceListContainer.insertBefore(msgElement, provinceListContainer.firstChild);
+           // Cek jika container kosong sebelum menambah
+           if (provinceListContainer.children.length === 0 || provinceListContainer.firstElementChild.classList.contains('province-item')) {
+                provinceListContainer.insertBefore(msgElement, provinceListContainer.firstChild);
+           } else if (!provinceListContainer.querySelector('.no-results-message')){
+               // Jika sudah ada elemen lain (selain item provinsi) dan belum ada pesan error, tambahkan
+               provinceListContainer.appendChild(msgElement);
+           }
         }
     }
 
