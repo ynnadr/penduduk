@@ -82,7 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
              const totalProvinces = Object.keys(provincesTemp).length;
 
             // Langkah 3: Update Judul dan Ringkasan (sama)
-            titleLine1Element.textContent = `Data Penduduk Indonesia (${minYear} - ${maxYear})`;
+            // ... (setelah minYear dan maxYear dihitung) ...
+
+// Langkah 3: Update Judul Halaman
+let yearDisplay;
+if (minYear === "N/A" || maxYear === "N/A") { // Kasus jika tidak ada tahun valid
+    yearDisplay = ""; // Atau "(Tahun Tidak Tersedia)"
+} else if (minYear === maxYear) {
+    yearDisplay = `(${maxYear})`; // Hanya tampilkan satu tahun
+} else {
+    yearDisplay = `(${minYear} - ${maxYear})`; // Tampilkan rentang tahun
+}
+
+titleLine1Element.textContent = `Data Penduduk Indonesia ${yearDisplay}`.trim(); // trim() untuk menghapus spasi ekstra jika yearDisplay kosong
+// ...
             titleLine2Element.textContent = `TOTAL ${formatNumber(totalPopulation)} orang`;
             summaryCountElement.textContent = `${totalProvinces} Provinsi - ${totalKabkot} Kabupaten/Kota`;
 
